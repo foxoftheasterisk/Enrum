@@ -3,7 +3,11 @@ using System.Collections;
 
 public class TopDownController : MonoBehaviour {
 
-    Rigidbody2D physicsController;
+    public bool onIce;
+    public float TORQUE_FACTOR = 1;
+    private Rigidbody2D physicsController;
+
+
 
 	// Use this for initialization
 	void Start () {
@@ -24,9 +28,15 @@ public class TopDownController : MonoBehaviour {
         if (Input.GetKey(KeyCode.RightArrow))
             velocity += new Vector2(0.5f, 0);
         
-        physicsController.AddForce(velocity);
+        if(onIce)
+        {
+            physicsController.AddForce(velocity);
+            velocity = physicsController.velocity;
+        }
+        else
+            physicsController.velocity = velocity;
 
-        velocity = physicsController.velocity;
+        
         
         if (velocity.magnitude != 0)
         {
@@ -37,6 +47,8 @@ public class TopDownController : MonoBehaviour {
             {
                 float torque = targetRotation - physicsController.rotation;
                 torque = torque % 360;
+                if (torque < 0)
+                    torque = 360 + torque;
                 if (torque > 180)
                     torque = 360 - torque;
                 torque = torque / 360;
@@ -44,6 +56,8 @@ public class TopDownController : MonoBehaviour {
                     torque = 10;
                 if (torque < -10)
                     torque = -10;
+                torque = torque * TORQUE_FACTOR;
+
                 physicsController.AddTorque(torque);
             }
         }
