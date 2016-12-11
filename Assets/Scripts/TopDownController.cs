@@ -24,17 +24,39 @@ public class TopDownController : MonoBehaviour {
         if (Input.GetKey(KeyCode.RightArrow))
             velocity += new Vector2(0.5f, 0);
         
-        physicsController.velocity = velocity;
+        physicsController.AddForce(velocity);
 
+        velocity = physicsController.velocity;
+        
         if (velocity.magnitude != 0)
         {
-            float targetRotation = Vector2.Angle(new Vector2(1, 0), velocity);
-            if (velocity.y < 0)
+            float targetRotation = Vector2.Angle(new Vector2(0, 1), velocity);
+            if (velocity.x > 0)
                 targetRotation = -targetRotation;
             if (physicsController.rotation != targetRotation)
             {
-
+                float torque = targetRotation - physicsController.rotation;
+                torque = torque % 360;
+                if (torque > 180)
+                    torque = 360 - torque;
+                torque = torque / 360;
+                if (torque > 10)
+                    torque = 10;
+                if (torque < -10)
+                    torque = -10;
+                physicsController.AddTorque(torque);
             }
         }
+        //*/
 	}
+
+    void OnGUI()
+    {
+        Vector2 velocity = physicsController.velocity;
+        float targetRotation = Vector2.Angle(new Vector2(0, 1), velocity);
+        if (velocity.x < 0)
+            targetRotation = -targetRotation;
+
+        GUI.Label(new Rect(10, 10, 100, 60), "Current rotation: " + physicsController.rotation + "\nTarget rotation: " + targetRotation);
+    }
 }
