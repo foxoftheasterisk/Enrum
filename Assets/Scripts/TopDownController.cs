@@ -31,7 +31,7 @@ public class TopDownController : MonoBehaviour {
         if(onIce)
         {
             physicsController.AddForce(velocity);
-            velocity = physicsController.velocity;
+            //velocity = physicsController.velocity;
         }
         else
             physicsController.velocity = velocity;
@@ -43,34 +43,33 @@ public class TopDownController : MonoBehaviour {
             float targetRotation = Vector2.Angle(new Vector2(0, 1), velocity);
             if (velocity.x > 0)
                 targetRotation = -targetRotation;
+
+            float currentRotation = physicsController.rotation % 360;
+            if (currentRotation < 0)
+                currentRotation = currentRotation + 360;
+            if (currentRotation > 180)
+                currentRotation = currentRotation - 360;
+
             if (physicsController.rotation != targetRotation)
             {
-                float torque = targetRotation - physicsController.rotation;
-                torque = torque % 360;
+                float torque = targetRotation - currentRotation;
                 if (torque < 0)
-                    torque = 360 + torque;
+                    torque = torque + 360;
                 if (torque > 180)
-                    torque = 360 - torque;
+                    torque = torque - 360;
+
                 torque = torque / 360;
-                if (torque > 10)
-                    torque = 10;
-                if (torque < -10)
-                    torque = -10;
+                torque = -torque;
+
                 torque = torque * TORQUE_FACTOR;
 
                 physicsController.AddTorque(torque);
             }
         }
-        //*/
 	}
 
     void OnGUI()
     {
-        Vector2 velocity = physicsController.velocity;
-        float targetRotation = Vector2.Angle(new Vector2(0, 1), velocity);
-        if (velocity.x < 0)
-            targetRotation = -targetRotation;
-
-        GUI.Label(new Rect(10, 10, 100, 60), "Current rotation: " + physicsController.rotation + "\nTarget rotation: " + targetRotation);
+       
     }
 }
