@@ -58,7 +58,7 @@ public class KickItem : MonoBehaviour {
 	//triggers automatically on impact with object
 	void OnCollisionEnter2D(Collision2D collision)
 	{				
-		Debug.Log("Kick");
+		//Debug.Log("Kick");
 		string objectName; 
 		GameObject kickedObject = collision.gameObject;
 
@@ -66,7 +66,7 @@ public class KickItem : MonoBehaviour {
 		if (kickedObject.tag == "Furniture") {
 			if (ImportNameFile.inverseProductCatalog.TryGetValue (kickedObject, out objectName)) {
 				//print name of item
-				Debug.Log (objectName);
+				//Debug.Log (objectName);
 				if (!won) {					
 					//check if on shopping list
 					checkShoppingList (kickedObject, objectName);
