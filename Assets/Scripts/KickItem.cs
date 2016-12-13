@@ -1,9 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class KickItem : MonoBehaviour {
 
 	public static int numKicked = 0;
+	Text text;
+	bool won=false;
 
 	void Start() {
 	}
@@ -14,22 +17,35 @@ public class KickItem : MonoBehaviour {
 
 		// Play a sound if the colliding objects had a big impact.		
 		Debug.Log("Kick");
-		string kickedObject; 
+		string objectName; 
+		GameObject kickedObject = collision.gameObject;
 
+		//recognize furniture objects
+		if (kickedObject.tag == "Furniture") {
+			if (ImportNameFile.inverseProductCatalog.TryGetValue (kickedObject, out objectName)) {
+				//print name of item
+				Debug.Log (objectName);
 
-		if (ImportNameFile.inverseProductCatalog.TryGetValue(collision.gameObject, out kickedObject)) {
-					
-		} else {
+				GameObject FoundItem = GameObject.Find("FoundItem");
 
-			//assign a new name to object that is kicked
-			kickedObject = ImportNameFile.productNames [numKicked];
+				if (!won) {
+					text = FoundItem.GetComponent <Text> ();
+					text.text = "Found a " + objectName;
+				}
+				//check if on shopping list
+				if(ShoppingList.myList.ContainsKey(objectName)){
+					ShoppingList.myList[objectName] = true;
+					Debug.Log("item found");
+					Destroy (kickedObject);
+					if (!ShoppingList.myList.ContainsValue(false)){
+						won = true;
+						Debug.Log("Game Completed!");
+						text.text = "You've completed your shopping list!";
+					}
+				}
 
-			//add product name & id to product catalog
-			ImportNameFile.productCatalog.Add (kickedObject, collision.gameObject);
-			ImportNameFile.inverseProductCatalog.Add (collision.gameObject, kickedObject);
-
-			numKicked++;
+			} 
 		}
-		Debug.Log (kickedObject);
+
 	}
 }
